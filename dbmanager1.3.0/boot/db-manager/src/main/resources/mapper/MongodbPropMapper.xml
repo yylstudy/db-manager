@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkcircle.dbmanager.mapper.MongodbPropMapper">
+
+    <resultMap id="resultmap2" type="com.linkcircle.dbmanager.entity.MongodbProp">
+        <id column="id" property="id"/>
+        <result column="ip" property="ip" />
+        <result column="port" property="port" />
+        <result column="user" property="user" />
+        <result column="password" property="encryptPassword" />
+        <result column="create_time" property="createTime" />
+        <result column="computer_room_id" property="computerRoomId"/>
+        <result column="business_id" property="businessId" />
+        <result column="businessName" property="businessName" />
+        <result column="name" property="name" />
+        <result column="computerRoomName" property="computerRoomName" />
+        <result column="sshPort" property="sshPort" />
+        <result column="sshUser" property="sshUser" />
+        <result column="sshPassword" property="encryptSshPassword" />
+        <result column="backupPath" property="backupPath" />
+    </resultMap>
+    <sql id="base_column">
+       a.id,a.ip,a.port,a.user,a.password,a.create_time,a.computer_room_id,a.business_id,concat(b.project_name,'-',b.business_name) businessName
+       ,c.name computerRoomName,a.name name,a.ssh_port sshPort,a.ssh_user sshUser,a.ssh_password sshPassword,a.backup_path backupPath
+    </sql>
+    <select id="queryPage"  resultMap="resultmap2" >
+        select <include refid="base_column"/> from mongodb_prop a
+        left join business b on a.business_id = b.id
+        left join computer_room c on a.computer_room_id = c.id
+        where 1=1
+        <if test="mongodbProp.computerRoomId != null">
+            and c.id = #{mongodbProp.computerRoomId}
+        </if>
+        <if test="mongodbProp.businessId != null">
+            and b.id = #{mongodbProp.businessId}
+        </if>
+        <if test="mongodbProp.ip != null and mongodbProp.ip != ''">
+            and a.ip like concat('%',#{mongodbProp.ip},'%')
+        </if>
+    </select>
+</mapper>

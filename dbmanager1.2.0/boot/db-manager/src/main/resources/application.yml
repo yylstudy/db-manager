@@ -1,0 +1,159 @@
+server:
+  port: 9999
+  tomcat:
+    max-swallow-size: -1
+  error:
+    include-exception: true
+    include-stacktrace: ALWAYS
+    include-message: ALWAYS
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    min-response-size: 1024
+    mime-types: application/javascript,application/json,application/xml,text/html,text/xml,text/plain,text/css,image/*
+
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  #json 时间戳统一转换
+  jackson:
+    date-format:   yyyy-MM-dd HH:mm:ss
+    time-zone:   GMT+8
+  aop:
+    proxy-target-class: true
+  # 设置静态文件路径，js,css等
+  mvc:
+    static-path-pattern: /**
+  resource:
+    static-locations: classpath:/static/,classpath:/public/
+  datasource:
+    druid:
+      stat-view-servlet:
+        enabled: true
+        loginUsername: admin
+        loginPassword: 123456
+        allow:
+      web-stat-filter:
+        enabled: true
+      initial-size: 5
+      min-idle: 5
+      maxActive: 20
+      # 配置获取连接等待超时的时间
+      maxWait: 60000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      timeBetweenEvictionRunsMillis: 60000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: SELECT 1
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      # 打开PSCache，并且指定每个连接上PSCache的大小
+      poolPreparedStatements: true
+      maxPoolPreparedStatementPerConnectionSize: 20
+      # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+      filters: stat,wall,slf4j
+      # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+      connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+      url: jdbc:mysql://172.16.252.130:3306/db-manager-1.2.0?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+      username: root
+      password: cqt@1234
+      driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    password: cqt@1234
+    host: 172.16.252.130
+    port: 7001
+#    cluster:
+#      nodes: 172.16.252.117:8001,172.16.252.118:8001,172.16.252.119:8001,172.16.252.123:8001,172.16.252.124:8001,172.16.252.125:8001
+    # 连接超时时间（毫秒）
+    timeout: 3000
+    jedis:
+      pool:
+        maxActive: 5000
+        maxIdle: 30
+        minIdle: 5
+        max-wait: 5000
+
+  mail:
+    host: smtp.qiye.163.com
+    username: zentao@linkcircle.cn
+    password: jJXhSjsmnghNEXZE
+    properties:
+      mail:
+        smtp:
+          timeout: 120000
+msg:
+  msgAccount: 922001
+  msgPwd: S4GnRB
+  sign: 【承启通科技】
+  smsUrl: http://58.220.50.130:7862/sms
+#mybatis plus 设置
+mybatis-plus:
+  mapper-locations: classpath*:mapper/*.xml
+  global-config:
+    db-config:
+      id-type: ASSIGN_ID
+      table-underline: true
+  configuration:
+    call-setters-on-nulls: true
+common :
+  path :
+    upload: /opt/upFiles
+  shiro:
+    excludeUrls: /common/getYearningUrl,/download**
+#swagger
+knife4j:
+  #开启增强配置
+  enable: true
+  #开启生产环境屏蔽
+  production: false
+table:
+  backup:
+    path: /home
+
+software:
+  server:
+    host: 58.220.49.186
+    port: 56022
+    username: root
+    password: fjcqt@1234
+
+db:
+  escape:
+    map:
+      "[-]": '@002d'
+      "[.]": '@002e'
+
+yearningUrl: http://baidu.com
+
+defaultPrivateKey: MIIBVQIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEApX2g8pc3Jsf1DqyH24GTq6+gHvRMXSM5XP0qW2oKa8P0PXXDhpv6ZLWhgKuQ5REz9VmjGu4KmPe9M1g2o69ROwIDAQABAkEAlJuKwy2dPfsDiWjPGwNx+xNb41AXnu95nJJOzgYcU4YOQC5J0/a7Gb+VCSDC2YgLReom065o3lYBhEcDFYstCQIhAPHCQwakOURihwKNxjB1bLyDYKt8ftaxN9xXWe/1A0CvAiEArz09P1ALveSXNUfX0587R+VYSyknYwDklGYSb8dFIzUCIBul8tJkn6QBfJ0/J4ZNN5VLlRenkj3tYI0TdFar96ZDAiEAjScBz561ZobbeVJeOZq4EGhfH2ON00Rj2lkBnsHfIcUCIHQkJltftdtFFxm6I0FS2Y0FapfpN7DHXw4zRoL5JFfd
+defaultPublicKey: MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKV9oPKXNybH9Q6sh9uBk6uvoB70TF0jOVz9KltqCmvD9D11w4ab+mS1oYCrkOURM/VZoxruCpj3vTNYNqOvUTsCAwEAAQ==
+
+monitorCron: 0 0 09 * * ?
+thread:
+  num: 5
+upload:
+  type: local
+  local:
+    path: "D:\\test1"
+
+k8s:
+  excludeNamespaces:
+    - cattle
+    - ceph
+    - cert
+    - fleet
+    - harbor
+    - ingress-nginx
+    - kube
+    - local
+    - monitoring
+    - p-
+    - rabbitmq-system
+    - rabbitmq-system
+    - operator
+    - user-

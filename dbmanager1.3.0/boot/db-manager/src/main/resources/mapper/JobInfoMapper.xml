@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkcircle.dbmanager.mapper.JobInfoMapper">
+    <sql id="base_column">
+        a.id,job_cron,a.config_id,a.create_time,trigger_last_time,trigger_next_time,a.task_type,trigger_status,param,business_id,business_name,
+        b.name configName,d.name computerRoomName,e.ip datasourceName
+    </sql>
+
+    <select id="queryPage"  resultType="com.linkcircle.dbmanager.entity.JobInfo" >
+        select * from (select <include refid="base_column"/> from job_info a
+        left join backup_config b on a.config_id=b.id
+        left join datasource_prop e on b.prop_id=e.id
+        left join business c on e.business_id=c.id
+        left join computer_room d on e.computer_room_id=d.id
+        where a.task_type='1'
+        <if test="jobInfo.businessId != null">
+            and c.id = #{jobInfo.businessId}
+        </if>
+        <if test="jobInfo.computerRoomId != null">
+            and d.id = #{jobInfo.computerRoomId}
+        </if>
+        <if test="jobInfo.triggerStatus != null">
+            and a.trigger_status = #{jobInfo.triggerStatus}
+        </if>
+        <if test="jobInfo.mysqlSshHost != null and jobInfo.mysqlSshHost != ''">
+            and e.ip like concat('%',#{jobInfo.mysqlSshHost},'%')
+        </if>
+        <if test="jobInfo.taskType != null and jobInfo.taskType != ''">
+            and a.task_type = #{jobInfo.taskType}
+        </if>
+        union all
+        select <include refid="base_column"/> from job_info a
+        left join clear_data_config b on a.config_id=b.id
+        left join mysql_user f on  b.mysql_user_id=f.id
+        left join datasource_prop e on f.prop_id=e.id
+        left join business c on e.business_id=c.id
+        left join computer_room d on e.computer_room_id=d.id
+        where a.task_type='2'
+        <if test="jobInfo.businessId != null">
+            and c.id = #{jobInfo.businessId}
+        </if>
+        <if test="jobInfo.computerRoomId != null">
+            and d.id = #{jobInfo.computerRoomId}
+        </if>
+        <if test="jobInfo.triggerStatus != null">
+            and a.trigger_status = #{jobInfo.triggerStatus}
+        </if>
+        <if test="jobInfo.mysqlSshHost != null and jobInfo.mysqlSshHost != ''">
+            and e.ip like concat('%',#{jobInfo.mysqlSshHost},'%')
+        </if>
+        <if test="jobInfo.taskType != null and jobInfo.taskType != ''">
+            and a.task_type = #{jobInfo.taskType}
+        </if>
+
+        union all
+        select a.id,job_cron,a.config_id,a.create_time,trigger_last_time,trigger_next_time,a.task_type,trigger_status,param,business_id,business_name,
+        e.name configName,d.name computerRoomName,concat(e.ip,':',e.port) datasourceName from job_info a
+        left join mongodb_prop e on a.config_id=e.id
+        left join business c on e.business_id=c.id
+        left join computer_room d on e.computer_room_id=d.id
+        where a.task_type='3'
+        <if test="jobInfo.businessId != null">
+            and c.id = #{jobInfo.businessId}
+        </if>
+        <if test="jobInfo.computerRoomId != null">
+            and d.id = #{jobInfo.computerRoomId}
+        </if>
+        <if test="jobInfo.triggerStatus != null">
+            and a.trigger_status = #{jobInfo.triggerStatus}
+        </if>
+        <if test="jobInfo.mysqlSshHost != null and jobInfo.mysqlSshHost != ''">
+            and e.ip like concat('%',#{jobInfo.mysqlSshHost},'%')
+        </if>
+        <if test="jobInfo.taskType != null and jobInfo.taskType != ''">
+            and a.task_type = #{jobInfo.taskType}
+        </if>
+        ) t order by t.create_time desc
+    </select>
+</mapper>

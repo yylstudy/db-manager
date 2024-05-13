@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkcircle.dbmanager.mapper.ClearDataConfigMapper">
+    <resultMap id="resultmap2" type="com.linkcircle.dbmanager.entity.ClearDataConfig">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="mysql_user_id" property="mysqlUserId" />
+        <result column="db_database" property="dbDatabase" />
+        <result column="clear_type" property="clearType" />
+        <result column="business_id" property="businessId" />
+        <result column="create_time" property="createTime" />
+        <result column="computer_room_id" property="computerRoomId" />
+        <result column="business_id" property="businessId" />
+<!--        <result column="mysql_ssh_port" property="mysqlSshPort" />-->
+<!--        <result column="mysql_ssh_user" property="mysqlSshUser" />-->
+<!--        <result column="mysql_ssh_password" property="mysqlSshPassword" />-->
+        <result column="datasourceName" property="datasourceName" />
+        <result column="businessName" property="businessName" />
+        <result column="computerRoomName" property="computerRoomName" />
+        <result column="ibd_frm_dir" property="ibdFrmDir" />
+        <result column="propId" property="propId" />
+        <collection property="tableNameRules" ofType="com.linkcircle.dbmanager.entity.TableNameRule">
+            <id column="tableRuleId" property="id" ></id>
+            <result column="clear_data_config_id" property="clearDataConfigId"/>
+            <result column="table_name_regular" property="tableNameRegular"/>
+            <result column="contain_time" property="containTime"/>
+            <result column="time_rule" property="timeRule"/>
+            <result column="clear_time_start" property="clearTimeStart"/>
+            <result column="clear_time_end" property="clearTimeEnd"/>
+        </collection>
+    </resultMap>
+    <sql id="base_column">
+        a.id,a.name,a.mysql_user_id,a.clear_type,
+        d.business_id,a.create_time,d.computer_room_id,
+--         a.mysql_ssh_port,a.mysql_ssh_user,a.mysql_ssh_password,
+         a.ibd_frm_dir,
+        b.id tableRuleId,b.clear_data_config_id,b.table_name_regular,b.contain_time,b.time_rule,b.clear_time_start,b.clear_time_end,
+        d.ip datasourceName,concat(project_name,'-',business_name) businessName,
+        f.name computerRoomName,d.id propId,a.db_database
+    </sql>
+
+    <select id="queryPage"  resultMap="resultmap2" >
+        select <include refid="base_column"/> from
+        clear_data_config a
+        left join clear_table_name_rule b on a.id=b.clear_data_config_id
+        left join mysql_user c on a.mysql_user_id=c.id
+        left join datasource_prop d on c.prop_id=d.id
+        left join business e on d.business_id=e.id
+        left join computer_room f on d.computer_room_id=f.id
+        where 1=1
+        <if test="clearDataConfig.computerRoomId != null">
+            and d.computer_room_id = #{clearDataConfig.computerRoomId}
+        </if>
+        <if test="clearDataConfig.businessId != null">
+            and d.business_id = #{clearDataConfig.businessId}
+        </if>
+        <if test="clearDataConfig.mysqlSshHost != null and clearDataConfig.mysqlSshHost != ''">
+            and d.ip like concat('%',#{clearDataConfig.mysqlSshHost},'%')
+        </if>
+        order by a.create_time desc
+    </select>
+    <select id="countByPropId" resultType="java.lang.Long">
+        select count(1) from clear_data_config a
+        left join mysql_user b on a.mysql_user_id=b.id
+        left join datasource_prop c on b.prop_id=c.id where c.id=#{propId}
+    </select>
+</mapper>

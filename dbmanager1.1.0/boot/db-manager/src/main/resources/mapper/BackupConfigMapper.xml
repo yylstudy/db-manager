@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkcircle.dbmanager.mapper.BackupConfigMapper">
+    <resultMap id="resultmap" type="com.linkcircle.dbmanager.entity.BackupConfig">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="prop_id" property="propId" />
+        <result column="mysql_ssh_port" property="mysqlSshPort" />
+        <result column="mysql_ssh_user" property="mysqlSshUser" />
+        <result column="mysql_ssh_password" property="mysqlSshPassword" />
+        <result column="backup_path" property="backupPath" />
+        <result column="mysql_cnf" property="mysqlCnf" />
+        <result column="day_before_full" property="dayBeforeFull" />
+        <result column="keep_days" property="keepDays" />
+        <result column="create_time" property="createTime" />
+        <result column="status" property="status" />
+        <result column="backup_databases" property="backupDatabases" typeHandler="com.linkcircle.dbmanager.typehandler.StringListToStringTypeHandler"/>
+        <result column="datasourceName" property="datasourceName" />
+        <result column="businessName" property="businessName" />
+        <result column="computerRoomName" property="computerRoomName" />
+    </resultMap>
+    <sql id="base_column">
+        a.id,a.name,a.prop_id,a.mysql_ssh_port,a.mysql_ssh_user,a.mysql_ssh_password,a.backup_path,a.mysql_cnf,
+        a.day_before_full,a.keep_days,a.create_time,a.status,a.backup_databases,d.ip datasourceName,concat(project_name,'-',business_name) businessName,
+        f.name computerRoomName
+
+    </sql>
+
+    <select id="queryPage"  resultMap="resultmap" >
+        select <include refid="base_column"/> from
+        backup_config a
+        left join datasource_prop d on a.prop_id=d.id
+        left join business e on d.business_id=e.id
+        left join computer_room f on d.computer_room_id=f.id
+        where 1=1
+        <if test="backupConfig.computerRoomId != null">
+            and d.computer_room_id = #{backupConfig.computerRoomId}
+        </if>
+        <if test="backupConfig.businessId != null">
+            and d.business_id = #{backupConfig.businessId}
+        </if>
+        <if test="backupConfig.mysqlSshHost != null and backupConfig.mysqlSshHost != ''">
+            and d.ip like concat('%',#{backupConfig.mysqlSshHost},'%')
+        </if>
+
+        order by a.create_time desc
+    </select>
+</mapper>

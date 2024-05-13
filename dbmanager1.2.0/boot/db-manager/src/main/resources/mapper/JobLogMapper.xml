@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkcircle.dbmanager.mapper.JobLogMapper">
+
+    <sql id="base_column">
+        a.ibdfrm_path ibdfrmPath,a.id,a.job_id,a.start_date,a.execute_param,a.end_date,a.handle_code,a.create_time,b.business_name,b.task_type
+        ,computerRoomName,computerRoomId,datasourceName,configName
+    </sql>
+    <sql id="base_column2">
+        a.id,job_cron,a.config_id,a.create_time,trigger_last_time,trigger_next_time,a.task_type,trigger_status,param,business_id,business_name,
+        b.name configName,d.name computerRoomName,d.id computerRoomId,e.ip datasourceName
+    </sql>
+
+    <select id="queryPage"  resultType="com.linkcircle.dbmanager.entity.JobLog" >
+        select <include refid="base_column"/> from job_log a left join(
+        select <include refid="base_column2"/> from job_info a
+        left join backup_config b on a.config_id=b.id
+        left join datasource_prop e on b.prop_id=e.id
+        left join business c on e.business_id=c.id
+        left join computer_room d on e.computer_room_id=d.id
+        where a.task_type='1'
+
+        union all
+        select <include refid="base_column2"/> from job_info a
+        left join clear_data_config b on a.config_id=b.id
+        left join mysql_user f on  b.mysql_user_id=f.id
+        left join datasource_prop e on f.prop_id=e.id
+        left join business c on e.business_id=c.id
+        left join computer_room d on e.computer_room_id=d.id
+        where a.task_type='2') b on a.job_id=b.id where 1=1
+        <if test="jobLog.computerRoomId != null">
+            and b.computerRoomId = #{jobLog.computerRoomId}
+        </if>
+        <if test="jobLog.taskType != null">
+            and b.task_type = #{jobLog.taskType}
+        </if>
+        <if test="jobLog.configId != null">
+            and b.config_id = #{jobLog.configId}
+        </if>
+        <if test="jobLog.handleCode != null">
+            and a.handle_code = #{jobLog.handleCode}
+        </if>
+        <if test="jobLog.mysqlSshHost != null">
+            and b.datasourceName like concat('%',#{jobLog.mysqlSshHost},'%')
+        </if>
+        <if test="jobLog.queryDateStart != null and jobLog.queryDateStart != ''">
+            and DATE_FORMAT(a.create_time,'%Y-%m-%d') = #{jobLog.queryDateStart}
+        </if>
+
+         order by  a.start_date desc
+    </select>
+</mapper>

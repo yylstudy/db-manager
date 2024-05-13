@@ -1,0 +1,230 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.linkcircle.boot</groupId>
+  <artifactId>boot-parent</artifactId>
+  <version>1.1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  	<parent>
+	    <groupId>org.springframework.boot</groupId>
+	    <artifactId>spring-boot-starter-parent</artifactId>
+	    <version>2.3.5.RELEASE</version>
+	    <relativePath/>
+	</parent>
+
+	<properties>
+		<boot.version>1.1.0-SNAPSHOT</boot.version>
+		<java.version>1.8</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <fastjson.version>1.2.76</fastjson.version>
+		<knife4j-spring-boot-starter.version>2.0.9</knife4j-spring-boot-starter.version>
+		<knife4j-spring-ui.version>2.0.9</knife4j-spring-ui.version>
+		<mysql-connector-java.version>8.0.21</mysql-connector-java.version>
+		<hutool.version>5.3.8</hutool.version>
+		<commons-beanutils.version>1.9.4</commons-beanutils.version>
+		<guava.version>29.0-jre</guava.version>
+		<mybatis-plus.version>3.4.3.1</mybatis-plus.version>
+		<druid.version>1.1.22</druid.version>
+		<commons.version>2.6</commons.version>
+		<shiro.version>1.10.0</shiro.version>
+		<java-jwt.version>3.11.0</java-jwt.version>
+		<shiro-redis.version>3.1.0</shiro-redis.version>
+		<autopoi-web.version>1.3.5</autopoi-web.version>
+		<dom4j.version>1.6.1</dom4j.version>
+		<redisson.version>3.13.6</redisson.version>
+	</properties>
+
+	<modules>
+        <module>base-core</module>
+        <module>base-system</module>
+		<module>db-manager</module>
+	</modules>
+
+	<distributionManagement>
+	  	<repository>
+            <id>jeecg</id>
+            <name>jeecg Repository</name>
+            <url>http://maven.jeecg.com:8090/nexus/content/repositories/jeecg</url>
+        </repository>
+        <snapshotRepository>
+	        <id>jeecg-snapshots</id>
+            <name>jeecg Snapshot Repository</name>
+            <url>http://maven.jeecg.com:8090/nexus/content/repositories/snapshots/</url>
+	    </snapshotRepository>
+	</distributionManagement>
+	<repositories>
+		<repository>
+            <id>aliyun</id>
+            <name>aliyun Repository</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+        </repository>
+		<repository>
+            <id>jeecg</id>
+            <name>jeecg Repository</name>
+            <url>https://maven.jeecg.org/nexus/content/repositories/jeecg</url>
+            <snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+        </repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- Lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+		<!-- json -->
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>${fastjson.version}</version>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- system 模块-->
+			<dependency>
+				<groupId>com.linkcircle.boot</groupId>
+				<artifactId>base-system</artifactId>
+				<version>${boot.version}</version>
+			</dependency>
+			<!-- jeecg core -->
+			<dependency>
+				<groupId>com.linkcircle.boot</groupId>
+				<artifactId>base-core</artifactId>
+				<version>${boot.version}</version>
+			</dependency>
+
+			<!-- guava工具类 -->
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>${guava.version}</version>
+			</dependency>
+
+			<!-- hutool工具类-->
+			<dependency>
+				<groupId>cn.hutool</groupId>
+				<artifactId>hutool-core</artifactId>
+				<version>${hutool.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>cn.hutool</groupId>
+				<artifactId>hutool-crypto</artifactId>
+				<version>${hutool.version}</version>
+			</dependency>
+
+			<!-- commons-beanutils -->
+			<dependency>
+				<groupId>commons-beanutils</groupId>
+				<artifactId>commons-beanutils</artifactId>
+				<version>${commons-beanutils.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.squareup.okhttp3</groupId>
+				<artifactId>okhttp</artifactId>
+				<version>4.4.1</version>
+			</dependency>
+			<dependency>
+				<groupId>com.jcraft</groupId>
+				<artifactId>jsch</artifactId>
+				<version>0.1.55</version>
+			</dependency>
+			<dependency>
+				<groupId>com.hierynomus</groupId>
+				<artifactId>sshj</artifactId>
+				<version>0.31.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.skywalking</groupId>
+				<artifactId>apm-toolkit-logback-1.x</artifactId>
+				<version>8.3.0</version>
+			</dependency>
+			<dependency>
+				<groupId>p6spy</groupId>
+				<artifactId>p6spy</artifactId>
+				<version>3.9.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.redisson</groupId>
+				<artifactId>redisson-spring-boot-starter</artifactId>
+				<version>3.9.1</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-starter-data-redis</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>1.14</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<!--<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			 指定JDK编译版本 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <!-- 打包跳过测试 -->
+            <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-surefire-plugin</artifactId>
+		        <configuration>
+		          <skipTests>true</skipTests>
+		        </configuration>
+	        </plugin>
+	         <!-- 避免font文件的二进制文件格式压缩破坏 -->
+	         <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>woff</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>woff2</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>eot</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>svg</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
+                </configuration>
+            </plugin>
+		</plugins>
+		<resources>
+			<resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.xml</include>
+					<include>**/*.json</include>
+					<include>**/*.ftl</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
+</project>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkcircle.dbmanager.mapper.JobInfoHisMapper">
+    <sql id="base_column">
+        a.del_time,a.id,job_cron,a.config_id,a.create_time,trigger_last_time,trigger_next_time,a.task_type,trigger_status,param,business_id,business_name,
+        b.name configName,d.ip datasourceName
+    </sql>
+
+    <select id="queryPage"  resultType="com.linkcircle.dbmanager.entity.JobInfoHis" >
+        select * from (select <include refid="base_column"/> from job_info_his a
+        left join backup_config b on a.config_id=b.id
+        left join datasource_prop d on b.prop_id=d.id
+        left join business c on d.business_id=c.id
+        where a.task_type='1'
+        <if test="jobInfoHis.businessId != null">
+            and c.id = #{jobInfoHis.businessId}
+        </if>
+        union all
+        select <include refid="base_column"/> from job_info_his a
+        left join clear_data_config b on a.config_id=b.id
+        left join mysql_user e on b.mysql_user_id=e.id
+        left join datasource_prop d on e.prop_id=d.id
+        left join business c on d.business_id=c.id
+        where a.task_type='2'
+        <if test="jobInfoHis.businessId != null">
+            and c.id = #{jobInfoHis.businessId}
+        </if>
+        ) t order by t.create_time desc
+    </select>
+</mapper>

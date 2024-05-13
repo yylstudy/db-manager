@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkcircle.dbmanager.mapper.DatasourcePropMapper">
+
+    <resultMap id="resultmap2" type="com.linkcircle.dbmanager.entity.DatasourceProp">
+        <id column="id" property="id"/>
+        <result column="ip" property="ip" />
+        <result column="port" property="port" />
+        <result column="user" property="user" />
+        <result column="password" property="encryptPwd" />
+        <result column="ssh_password" property="encryptSshPassword" />
+        <result column="create_time" property="createTime" />
+        <result column="computer_room_id" property="computerRoomId"/>
+        <result column="business_id" property="businessId" />
+        <result column="businessName" property="businessName" />
+        <result column="computerRoomName" property="computerRoomName" />
+        <result column="ssh_port" property="sshPort" />
+        <result column="ssh_user" property="sshUser" />
+        <result column="group_id" property="groupId" />
+        <result column="sudo_user" property="sudoUser" />
+        <result column="isk8s" property="isk8s" />
+        <result column="k8s_config_id" property="k8sConfigId" />
+        <result column="namespace" property="namespace" />
+        <result column="pod_name" property="podName" />
+        <result column="enable_remote_store" property="enableRemoteStore" />
+    </resultMap>
+    <sql id="base_column">
+       a.id,a.ip,a.group_id,a.port,a.user,a.password,a.isk8s,a.k8s_config_id,a.namespace,a.pod_name,a.create_time,a.computer_room_id,a.business_id,concat(b.project_name,'-',b.business_name) businessName ,c.name computerRoomName,
+       a.ssh_port,a.ssh_user,a.ssh_password,a.sudo_user,a.enable_remote_store
+    </sql>
+    <select id="queryPage"  resultMap="resultmap2" >
+        select <include refid="base_column"/> from datasource_prop a
+        left join business b on a.business_id = b.id
+        left join computer_room c on a.computer_room_id = c.id
+        where 1=1
+        <if test="datasourceProp.computerRoomId != null">
+            and c.id = #{datasourceProp.computerRoomId}
+        </if>
+        <if test="datasourceProp.businessId != null">
+            and b.id = #{datasourceProp.businessId}
+        </if>
+        <if test="datasourceProp.ip != null and datasourceProp.ip != ''">
+            and a.ip like concat('%',#{datasourceProp.ip},'%')
+        </if>
+    </select>
+</mapper>
