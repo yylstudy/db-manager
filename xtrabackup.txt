@@ -1,0 +1,161 @@
+备份某张表
+innobackupex --tables-file=/root/tablename.txt --host=172.16.252.130 --port=3306 --user=root --password=cqt@1234 /home/backfile/full_backup
+
+innobackupex --apply-log --host=172.16.252.130 --port=3306 --user=root --password=cqt@1234  /home/backfile/full_backup
+innobackupex --defaults-file=/etc/my.cnf --copy-back  /root/backfile/2021-08-17_17-23-54
+
+ mysql -e "set foreign_key_checks=0;alter table test111* import tablespace;analyze table test111*;"
+
+ mysql -h 172.16.252.130 -u root -P 3306 --database test3 -p  -e  "set foreign_key_checks=0;alter table test111.* import tablespace;analyze table test111.*;"
+
+ mysql -h 172.16.252.130 -u root -P 3306 --database test3 -p -e "set foreign_key_checks=0;alter table test111.* discard tablespace;"
+
+mysqlfrm test111.frm --host=172.16.252.130 --port=3434 --user=root  --diagnostic 
+
+
+mysqlfrm --server=root:cqt@1234@172.16.252.130:3306 attachment.frm --port=3434 --user=root --diagnostic  --show-stats
+
+alter table test111 discard  tablespace;
+alter table test111 import tablespace;
+
+mysqlfrm equipment.frm  --host=172.16.252.130 --port=3434 --user=root  --diagnostic 
+
+
+
+全量备份
+date
+innobackupex --host=172.16.252.130 --user=root --password=cqt@1234 --no-timestamp /home/backupfile/full
+
+
+
+xtrabackup --defaults-file=/etc/my.cnf   --backup --host=172.16.252.130 --no-timestamp --user=root --password=cqt@1234  --target-dir=/home/backupfile/full
+
+ echo [ ! -d /home/backupfile/*incr*/]
+
+
+
+复制
+date
+innobackupex --copy-back /home/backfile/full_backup
+date
+
+导出
+date
+mydumper  -h 172.16.252.121 -u root -p cqt@1234 -B water-boot -T equipment  -t 8 -r 100000 -c --less-locking  -v 3  -L /var/log/mydumper.log   -o /root/backfile
+date
+
+导入
+date
+myloader   -h 172.16.252.130 -u root -p cqt@1234  -B test -e -t 8  -d /root/backfile/ --overwrite-tables -v 3
+date
+
+y
+
+
+kubectl delete -f leaf.yml -f   nacos.yml    -f  system.yml   -f   water-client.yml   -f   water-data-collect.yml -f  water-manager.yml -f  xxl-job.yml \
+-f  ingress.yml -f  mysql.yml -f  rabbitmq.yml -f  water-api.yml -f  water-configmap.yml -f  water-logs.yml       -f    water-web.yml
+
+kubectl get namespace water  -o json > tmp.json
+curl -k -H "Content-Type: application/json" -X PUT --data-binary @tmp.json http://127.0.0.1:8081/api/v1/namespaces/water/finalize
+
+rsync -avz --progress --delete backuplog -e "ssh -p 56022 -i /home/121id_rsa" root@172.16.252.130:/home/backfile/xxx_full
+
+rsync -avz start.sh -e "ssh -p 56022 -i /home/130id_dsa" root@172.16.252.121:/home/backfile/xxx_full
+
+tar -zcvf 2021-09-01_11-40-50_full.tar.gz *
+
+
+tar -zcvf 2021-09-01_11-40-50_full.tar.gz *
+
+
+
+5.4M	./2021-09-01_11-15-36_incr
+901M	./2021-09-01_11-14-30_full
+5.1M	./2021-09-01_11-16-11_incr
+
+fdisk -l
+
+xtrabackup --backup --compress --compress-threads=4 --host=127.0.0.1 --port=3306  --user=icsc --password=cqt@XufSqSm7@#  --no-timestamp   --target-dir=/home/backupfile/full
+
+
+xtrabackup --defaults-file=/etc/my.cnf   --backup --compress --compress-threads=4 --host=172.16.252.130 --port=3306  --user=root --password=cqt@1234 --no-timestamp  --target-dir=/home/backupfile/full
+xtrabackup --defaults-file=/etc/my.cnf --backup --compress --compress-threads=4  --host=172.16.252.130 --port=3306 --user=root --passwordcqt@1234 --no-timestamp   --target-dir=/home/backupfile/full
+
+
+xtrabackup --defaults-file=/etc/my.cnf   --backup --compress --compress-threads=4 --host=172.16.252.130 --port=3306  --user=root --password=cqt@1234 --no-timestamp --incremental-basedir=/home/backupfile/full --target-dir=/home/backupfile/incr1
+
+xtrabackup --defaults-file=/etc/my.cnf   --backup --compress --compress-threads=4 --host=172.16.252.130 --port=3306  --user=root --password=cqt@1234 --no-timestamp --incremental-basedir=/home/backupfile/incr1 --target-dir=/home/backupfile/incr2
+
+
+xtrabackup --defaults-file=/etc/my.cnf --decompress --remove-original --parallel=4 --target-dir=/home/backupfile/full
+xtrabackup --defaults-file=/etc/my.cnf --prepare --apply-log-only --target-dir=/home/backupfile/full
+xtrabackup --defaults-file=/etc/my.cnf --decompress --remove-original --parallel=4 --target-dir=/home/backupfile/incr1
+xtrabackup --defaults-file=/etc/my.cnf --prepare --apply-log-only --target-dir=/home/backupfile/full --incremental-dir=/home/backupfile/incr1
+xtrabackup --defaults-file=/etc/my.cnf --decompress --remove-original --parallel=4 --target-dir=/home/backupfile/incr2
+xtrabackup --defaults-file=/etc/my.cnf --prepare --apply-log-only --target-dir=/home/backupfile/full --incremental-dir=/home/backupfile/incr2
+
+xtrabackup --copy-back --target-dir=/data/all20220516223011/full20220516223011
+
+IOUtils.toString(in,"utf-8");
+
+
+xtrabackup --defaults-file=/etc/my.cnf --decompress --remove-original --parallel=4 --target-dir=/home/backupfile/full20210918151742
+xtrabackup --defaults-file=/etc/my.cnf --prepare --apply-log-only --target-dir=/home/backupfile/full20210918151742
+xtrabackup --defaults-file=/etc/my.cnf --decompress --remove-original --parallel=4 --target-dir=/home/backupfile/incr20210918151811
+xtrabackup --defaults-file=/etc/my.cnf --prepare --apply-log-only --target-dir=/home/backupfile/full20210918151742 --incremental-dir=/home/backupfile/incr20210918151811
+xtrabackup --defaults-file=/etc/my.cnf --decompress --remove-original --parallel=4 --target-dir=/home/backupfile/incr20210918151836
+xtrabackup --defaults-file=/etc/my.cnf --prepare --apply-log-only --target-dir=/home/backupfile/full20210918151742 --incremental-dir=/home/backupfile/incr20210918151836
+
+
+xtrabackup --defaults-file=/etc/my.cnf --decompress --remove-original --parallel=4 --target-dir=/root/all20210925145304/full20210925145304
+xtrabackup --defaults-file=/etc/my.cnf --prepare --apply-log-only --target-dir=/root/all20210925145304/full20210925145304
+xtrabackup --defaults-file=/etc/my.cnf --decompress --remove-original --parallel=4 --target-dir=/root/all20210925145304/incr20210928145340
+xtrabackup --defaults-file=/etc/my.cnf --prepare --apply-log-only --target-dir=/root/all20210925145304/full20210925145304 --incremental-dir=/root/all20210925145304/incr20210928145340
+
+
+ xtrabackup --defaults-file=/etc/my.cnf --copy-back --target-dir=/root/all20210925145304/full20210925145304
+
+
+xtrabackup --defaults-file=/etc/my.cnf   --backup --compress --compress-threads=4 --host=172.16.252.130 --port=3306 --databases="xxl@002djob information_schema mysql performance_schema sys otter yearning"   --user=root --password=cqt@1234 --no-timestamp  --target-dir=/home/backupfile/full
+
+xtrabackup --defaults-file=/etc/my.cnf --decompress --remove-original --parallel=4 --target-dir=/home/backupfile/full
+xtrabackup --defaults-file=/etc/my.cnf --prepare --apply-log-only --target-dir=/home/backupfile/full
+
+
+
+ xtrabackup --defaults-file=/etc/my.cnf --copy-back --target-dir=/home/backupfile/full
+
+
+xtrabackup --decompress --remove-original --parallel=4 --target-dir=/home/dbmanager/backupfiles/full20230906155329
+xtrabackup --defaults-file=/etc/my.cnf --prepare --apply-log-only --target-dir=/home/backupfiles/full20211031220003
+xtrabackup --defaults-file=/etc/my.cnf --datadir=/var/lib/mysql  --copy-back --target-dir=/home/backupfiles/full20211031220003
+
+
+
+xtrabackup --defaults-file=/etc/my.cnf --decompress --remove-original --parallel=4 --target-dir=/data/all20220516223011/full20220516223011
+xtrabackup --defaults-file=/etc/my.cnf --prepare --apply-log-only --target-dir=/data/all20220516223011/full20220516223011
+
+xtrabackup --defaults-file=/etc/my.cnf --decompress --remove-original --parallel=8 --target-dir=/data/all20220516223011/incr20220517223016
+xtrabackup --defaults-file=/etc/my.cnf --prepare --apply-log-only --target-dir=/data/all20220516223011/full20220516223011 --incremental-dir=/data/all20220516223011/incr20220517223016
+
+xtrabackup --defaults-file=/etc/my.cnf --decompress --remove-original --parallel=8 --target-dir=/data/all20220516223011/incr20220518223012
+xtrabackup --defaults-file=/etc/my.cnf --prepare --apply-log-only --target-dir=/data/all20220516223011/full20220516223011 --incremental-dir=/data/all20220516223011/incr20220518223012
+
+xtrabackup --defaults-file=/etc/my.cnf --decompress --remove-original --parallel=8 --target-dir=/data/all20220516223011/incr20220519223051
+xtrabackup --defaults-file=/etc/my.cnf --prepare --apply-log-only --target-dir=/data/all20220516223011/full20220516223011 --incremental-dir=/data/all20220516223011/incr20220519223051
+
+xtrabackup --defaults-file=/etc/my.cnf --decompress --remove-original --parallel=8 --target-dir=/data/all20220516223011/incr20220520223031
+
+
+xtrabackup --defaults-file=/etc/my.cnf --decompress --remove-original --parallel=8 --target-dir=/data/all20220516223011/incr20220521223031
+
+
+xtrabackup --defaults-file=/etc/my.cnf --decompress --remove-original --parallel=8 --target-dir=/data/all20220516223011/incr20220522223016
+
+
+xtrabackup --defaults-file=/etc/my.cnf --prepare --apply-log-only --target-dir=/data/all20220516223011/full20220516223011 --incremental-dir=/data/all20220516223011/incr20220520223031
+xtrabackup --defaults-file=/etc/my.cnf --prepare --apply-log-only --target-dir=/data/all20220516223011/full20220516223011 --incremental-dir=/data/all20220516223011/incr20220521223031
+xtrabackup --defaults-file=/etc/my.cnf --prepare --apply-log-only --target-dir=/data/all20220516223011/full20220516223011 --incremental-dir=/data/all20220516223011/incr20220522223016
+
+
+

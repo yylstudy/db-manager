@@ -1,0 +1,235 @@
+ssh到目标数据库，安装nfs客户端
+yum -y install nfs-utils
+创建用户
+adduser dbmanager
+设置密码
+passwd dbmanager
+安装xtrabackup
+yum install -y percona-xtrabackup-24-2.4.9-1.el7.x86_64.rpm 
+安装qpress
+tar xvf qpress-11-linux-x64.tar
+cp qpress /usr/bin
+
+挂载到nfs  
+mount 10.106.241.126:/mnt/JiNan_NAS/DATABASES/027-013 /home/dbmanager
+mount 10.104.241.126:/mnt/ZhongNeng_NAS/DATABASES/060-122 /home/dbmanager
+mount 10.103.241.126:/mnt/NanJi_NAS/DATABASES/062-044 /home/dbmanager
+mount 10.100.241.126:/mnt/YangZhou-TrueNAS-0/DATABASES/069-122 /home/dbmanager
+mount 10.101.241.126:/mnt/NanJing-TrueNAS-0/DATABASES/000-012 /home/dbmanager
+mount 10.105.241.126:/mnt/YangZhouLT-TrueNAS-0/DATABASES/018-002 /home/dbmanager
+mount 10.107.241.126:/mnt/QingDao-TrueNAS-0/DATABASES/027-013 /home/dbmanager
+
+
+
+
+mount 10.107.241.126:/mnt/QingDao-TrueNAS-0/DATABASES/027-013 /home/dbmanager
+mount 10.107.241.126:/mnt/QingDao-TrueNAS-0/DATABASES/027-014 /home/dbmanager
+
+
+10.105.12.21-22
+10.106.27.13-14
+10.107.27.13-14
+
+
+
+0 20 22 * * ?	
+
+mount 10.102.241.126:/mnt/JiNan_NAS/DATABASES/044-022 /home/dbmanager
+
+
+"insecure-registries": ["https://linkdockerhub.com","https://linkdockerhub.prod.com","58.220.49.186:11000"],
+
+mount 10.100.241.126:/mnt/YangZhou-TrueNAS-0/DATABASES/001-025 /home/dbmanager
+mount 10.100.241.126:/mnt/YangZhou-TrueNAS-0/DATABASES/001-026 /home/dbmanager
+mount 10.101.241.126:/mnt/NanJing-TrueNAS-0/DATABASES/001-025 /home/dbmanager
+mount 10.101.241.126:/mnt/NanJing-TrueNAS-0/DATABASES/001-026 /home/dbmanager
+
+10.100.241.126:/mnt/YangZhou-TrueNAS-0/DATABASES
+
+
+
+
+mount 10.100.241.126:/mnt/YangZhou-TrueNAS-0/DATABASES/040-161 /home/dbmanager
+
+
+acr_record_20221005_statistics
+vi /etc/rc.local
+more /etc/rc.local
+
+
+mount 58.220.51.178:/mnt/YangZhou-TrueNAS-0/DATABASES/040-161 /home/dbmanager/backupfiles
+
+
+mount 58.56.111.69:/mnt/JiNan_NAS/DATABASES/044-022 /home/dbmanager/ibdfrms
+
+
+route add -net 10.101.241.126 netmask 255.255.255.255 gw 172.16.18.1
+
+vi  /etc/sysconfig/static-routes
+any net 10.100.241.126 netmask 255.255.255.255 gw 172.16.40.1
+
+
+vi /etc/hosts.allow
+showmount -e 10.100.241.126
+
+sshd:172.16.66.246
+sshd:172.16.69.222
+
+创建数据库备份目录
+
+mkdir /home/dbmanager/backupfiles
+mkdir /home/dbmanager/ibdfrms
+chown -R dbmanager /home/dbmanager
+
+cd /home/dbmanager && ls
+cd /home/mysql/data/ && ll && du -ah --max-depth=1
+
+授权mysql目录读权限
+
+usermod -G mysql dbmanager 
+
+usermod -G root dbmanager
+
+/etc/my.cnf
+http://180.250.169.48:8082/channelList.htm
+http://180.250.169.48:8083/channelList.htm
+vi /etc/rc.local
+172.16.69.9
+172.16.66.119
+
+yearning
+yearning20211206
+yearning202110
+yearning0902
+(tvs8000.?|tvsco8000.?)
+
+ CREATE USER 'yearning'@'%' IDENTIFIED BY 'yearning202110';
+grant all privileges on *.* to 'yearning'@'%' identified by 'yearning202110';
+
+grant all privileges on `iccp`.* to 'yearning'@'%' identified by 'yearning202110';
+
+ update mysql.user set Grant_priv='Y' where user='yearning';
+ FLUSH PRIVILEGES;
+
+CREATE USER 'fsbc'@'%' IDENTIFIED BY '98hlDfSnr#';
+grant all privileges on *.* to 'fsbc'@'%' identified by '98hlDfSnr#';
+
+
+
+
+
+grant all privileges on *.* to 'fsbc'@'%' identified by '98hlDfSnr#';
+
+chmod  a+rx -R  /home/software/mysql
+
+
+chmod  a+rx -R /home/mysql/data
+chmod  a+rx -R /data/mysql/data
+
+change master to master_host='172.0.16.19', master_user='root', master_password='cqt@1234', master_port=3300, master_auto_position=1;
+change master to master_host='172.0.16.22', master_user='root', master_password='cqt@1234', master_port=3300, master_auto_position=1;
+
+select host,user,Grant_priv from mysql.user;
+mysql -h172.16.64.22 -uyearning -p
+yearning20211206
+flush  PRIVILEGES
+
+
+
+source /home/yunwei/mysql_dump.sql
+
+CREATE USER 'tyhmyc'@'%' IDENTIFIED BY 'tyhmyc';
+grant all privileges on *.* to 'tyhmyc'@'%' identified by 'tyhmyc';
+
+172.16.40.62 某个ibd文件无读写权限
+172.16.40.61 某个ibd文件无读写权限
+172.16.68.75 待运维查看
+172.16.68.76 待运维查看
+172.16.57.11 重新mount下
+172.16.57.13 重新mount下
+
+暂停机房任务
+
+select concat('update job_info set  trigger_status=0 where id=\'',id,'\';') from (select a.id,job_cron,a.config_id,a.create_time,trigger_last_time,trigger_next_time,a.task_type,trigger_status,param,business_id,business_name,
+        b.name configName,d.name computerRoomName,e.ip datasourceName from job_info a
+        left join backup_config b on a.config_id=b.id
+        left join datasource_prop e on b.prop_id=e.id
+        left join business c on e.business_id=c.id
+        left join computer_room d on e.computer_room_id=d.id
+        where a.task_type='1'
+        and d.id = '1476845162549215233'
+        union all
+        select a.id,job_cron,a.config_id,a.create_time,trigger_last_time,trigger_next_time,a.task_type,trigger_status,param,business_id,business_name,
+        b.name configName,d.name computerRoomName,e.ip datasourceName from job_info a
+        left join clear_data_config b on a.config_id=b.id
+        left join mysql_user f on  b.mysql_user_id=f.id
+        left join datasource_prop e on f.prop_id=e.id
+        left join business c on e.business_id=c.id
+        left join computer_room d on e.computer_room_id=d.id
+        where a.task_type='2'
+        and d.id = '1476845162549215233'
+        ) t where trigger_status=1 order by t.create_time desc
+
+统计
+select sum(success),sum(fail) from (select DATE_FORMAT(start_date,'%Y-%m-%d') date,sum(if(handle_code='2',1,0)) success,
+sum(if(handle_code='1' or handle_code='0',1,0)) fail
+from job_log where start_date>='2023-03-01 00:00:00' and start_date<='2023-03-31 23:59:59' group by date
+) tt
+
+
+
+权限配置
+
+#sudo权限配置文件增加权限规则和，dbmanager用户cp和xtrabackup具有sudo权限
+# 需要root权限执行
+echo 'dbmanager        ALL=(ALL)       NOPASSWD: /*bin/cp,/*bin/xtrabackup' >> /etc/sudoers
+
+#sudo执行cp和xtrabackup命令
+# dbmanager用户下执行
+sudo cp -rp xx xx
+sudo xtrabackup --backup --compress --compress-threads=4 --host=172.16.252.130 --port=3306  --user=root --password=cqt@1234  --no-timestamp   --target-dir=/home/backupfile/full
+
+chmod  a+rx -R /data/backfiles
+chown -R dbmanager /data/backfiles
+
+
+
+http://172.16.60.51:18080/channel_list.htm
+
+
+
+
+
+
+mount 10.100.241.126:/mnt/YangZhou-TrueNAS-0/DATABASES/040-027 /home/dbmanager
+
+
+
+
+
+
+change master to master_host='10.106.2.12', master_user='root', master_password='cqt@1234', master_port=3300, master_auto_position=1;
+change master to master_host='10.106.2.11', master_user='root', master_password='cqt@1234', master_port=3300, master_auto_position=1;
+
+
+
+
+
+
+
+ CREATE USER 'yearning'@'%' IDENTIFIED BY 'yearning202110';
+grant all privileges on *.* to 'yearning'@'%' identified by 'yearning202110';
+
+cqt!010@Mysql
+
+
+
+
+CREATE USER 'fsbc'@'%' IDENTIFIED BY 'cqt@fj887799';
+grant all privileges on *.* to 'fsbc'@'%' identified by 'cqt@fj887799';
+CREATE USER 'middleware'@'%' IDENTIFIED BY 'cqt@fj887799';
+grant all privileges on *.* to 'middleware'@'%' identified by 'cqt@fj887799';
+CREATE USER 'kamalilio'@'%' IDENTIFIED BY 'cqt@2020';
+grant all privileges on *.* to 'kamalilio'@'%' identified by 'cqt@2020';
+CREATE USER 'da'@'%' IDENTIFIED BY 'cqt@fj887799';
+grant all privileges on *.* to 'da'@'%' identified by 'cqt@fj887799';
