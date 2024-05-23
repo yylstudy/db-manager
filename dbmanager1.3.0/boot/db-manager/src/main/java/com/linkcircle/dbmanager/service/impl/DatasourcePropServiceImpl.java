@@ -11,6 +11,7 @@ import com.jcraft.jsch.Session;
 import com.linkcircle.boot.common.api.vo.Result;
 import com.linkcircle.boot.common.exception.BusinessException;
 import com.linkcircle.boot.common.system.vo.LoginUser;
+import com.linkcircle.boot.service.ApplicationContextSupport;
 import com.linkcircle.boot.service.CommonService;
 import com.linkcircle.dbmanager.common.*;
 import com.linkcircle.dbmanager.config.ExcludeNamespacesConfig;
@@ -41,6 +42,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 import javax.mail.internet.MimeUtility;
 import java.io.ByteArrayOutputStream;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLSyntaxErrorException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -108,6 +111,7 @@ public class DatasourcePropServiceImpl extends ServiceImpl<DatasourcePropMapper,
         List<MysqlUser> mysqlUserList = new ArrayList<>();
         List<DatasourceResetPasswordHis> hisList = new ArrayList<>();
         for (DatasourceProp prop : datasourceProps) {
+            MysqlUserGrantService mysqlUserGrantService = getMysqlUserGrantService(prop.getMysqlVersion());
             try(Connection connection = getConnection(prop)){
                 for(String host:hosts){
                     //这里加上IF NOT EXISTS 是防止有的双主数据库也会同步mysql库，那么用户就会创建失败，mysql5.6不支持CREATE USER  IF NOT EXISTS
@@ -118,7 +122,7 @@ public class DatasourcePropServiceImpl extends ServiceImpl<DatasourcePropMapper,
 //                        ps.setString(3,newPwd);
 //                    });
                     for(String db:dbs){
-                        grantPrivileges(connection,groupUserDto.getUsername(),host,newPwd,db);
+                        mysqlUserGrantService.grantPrivileges(connection,groupUserDto.getUsername(),host,newPwd,db,true);
                     }
                 }
                 flushPrivileges(connection);
@@ -145,6 +149,13 @@ public class DatasourcePropServiceImpl extends ServiceImpl<DatasourcePropMapper,
             return null;
         });
         return Result.OK();
+    }
+    private MysqlUserGrantService getMysqlUserGrantService(String mysqlVersion){
+        if(MysqlVersionEnum.EIGHT.getCode().equals(mysqlVersion)){
+            return ApplicationContextSupport.getBean(Mysql8UserGrantService.class);
+        }else{
+            return ApplicationContextSupport.getBean(Mysql5UserGrantService.class);
+        }
     }
 
     private String getPwdColumn(Connection connection){
@@ -249,6 +260,7 @@ public class DatasourcePropServiceImpl extends ServiceImpl<DatasourcePropMapper,
         String password = PwdUtil.decryptPwd(datasourceGroupUser.getPassword());
         List<MysqlUser> addList = new ArrayList<>();
         for (DatasourceProp prop : props) {
+            MysqlUserGrantService mysqlUserGrantService = getMysqlUserGrantService(prop.getMysqlVersion());
             try(Connection connection = getConnection(prop)){
                 //删除旧权限
                 for(DbUser dbUser:dbUsers){
@@ -274,7 +286,7 @@ public class DatasourcePropServiceImpl extends ServiceImpl<DatasourcePropMapper,
                 //增加新权限
                 for(String newDb:newDbs){
                     for(String newHost:newHosts){
-                        grantPrivileges(connection,groupUserDto.getUsername(),newHost,password,newDb);
+                        mysqlUserGrantService.grantPrivileges(connection,groupUserDto.getUsername(),newHost,password,newDb,false);
                     }
                 }
                 flushPrivileges(connection);
@@ -356,17 +368,17 @@ public class DatasourcePropServiceImpl extends ServiceImpl<DatasourcePropMapper,
 
     }
 
-    private void grantPrivileges(Connection connection,String username,String host,String password,String db){
-        if(!"*".equals(db)){
-            db = "`"+db+"`";
-        }
-        String grantAllSql = "grant all privileges on "+db+".* to ?@? identified by ?";
-        JdbcUtil.execute(connection,grantAllSql,ps->{
-            ps.setString(1,username);
-            ps.setString(2,host);
-            ps.setString(3,password);
-        });
-    }
+//    private void grantPrivileges(Connection connection,String username,String host,String password,String db){
+//        if(!"*".equals(db)){
+//            db = "`"+db+"`";
+//        }
+//        String grantAllSql = "grant all privileges on "+db+".* to ?@? identified by ?";
+//        JdbcUtil.execute(connection,grantAllSql,ps->{
+//            ps.setString(1,username);
+//            ps.setString(2,host);
+//            ps.setString(3,password);
+//        });
+//    }
 
     @Override
     public Result<?> deleteGroupUser(GroupUserDto groupUserDto) {
@@ -520,15 +532,11 @@ public class DatasourcePropServiceImpl extends ServiceImpl<DatasourcePropMapper,
         for (DbUser dbUser : dbUsers) {
             DatasourceProp prop = this.getById(dbUser.getPropId());
             prop.setPassword(PwdUtil.decryptPwd(prop.getPassword()));
+            MysqlUserGrantService mysqlUserGrantService = getMysqlUserGrantService(prop.getMysqlVersion());
             try(Connection connection = getConnection(prop)){
                 String passwordColumn = getPwdColumn(connection);
                 for (String host : dbUser.getHost().split(",")) {
-                    String sql = "update mysql.user set "+passwordColumn+" = password(?) where user=? and host=?";
-                    JdbcUtil.execute(connection,sql,ps->{
-                        ps.setString(1,realPassword);
-                        ps.setString(2,dbUser.getUsername());
-                        ps.setString(3,host);
-                    });
+                    mysqlUserGrantService.updatePassword(connection,dbUser.getUsername(),host,realPassword,passwordColumn);
                 }
                 flushPrivileges(connection);
             }catch (Exception e){
@@ -647,7 +655,17 @@ public class DatasourcePropServiceImpl extends ServiceImpl<DatasourcePropMapper,
     @Transactional(rollbackFor = Exception.class)
     public Result<?> add(DatasourceProp prop) {
         Session session = null;
-        try(Connection connection = getConnection(prop)){
+        try(Connection connection = getConnection(prop);
+            PreparedStatement ps = connection.prepareStatement("select version()");
+            ResultSet rs = ps.executeQuery();){
+            String version = MysqlVersionEnum.FIVE.getCode();
+            while (rs.next()){
+                String mysqlVersion = rs.getString(1);
+                if(mysqlVersion.startsWith("8.")){
+                    version = MysqlVersionEnum.EIGHT.getCode();
+                }
+            }
+            prop.setMysqlVersion(version);
             if(!CommonConstant.DATASOURCE_K8S.equals(prop.getIsk8s())){
                 session = SshUtil.getSession(prop.getIp(),prop.getSshPort(),prop.getSshUser(),prop.getSshPassword());
             }
@@ -701,6 +719,7 @@ public class DatasourcePropServiceImpl extends ServiceImpl<DatasourcePropMapper,
         }
 
     }
+
     @Override
     public Result<?> edit(DatasourceProp prop) {
         DatasourceProp dbProp = this.getById(prop.getId());

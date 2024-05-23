@@ -67,5 +67,9 @@ public class DatasourceProp {
     private String podName;
     @Dict(dicCode = "enable_remote_store")
     private String enableRemoteStore;
+    /**
+     * mysql版本
+     */
+    private String mysqlVersion;
 
 }

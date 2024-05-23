@@ -1417,6 +1417,6 @@ INSERT INTO `sys_dict`(`id`, `dict_name`, `dict_code`, `description`, `del_flag`
 INSERT INTO `sys_dict_item`(`id`, `dict_id`, `item_text`, `item_value`, `description`, `sort_order`, `status`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES ('1788099990392971266', '1788099949196517378', '否', '0', '', 1, 1, 'yyl', '2024-05-08 14:53:54', NULL, NULL);
 INSERT INTO `sys_dict_item`(`id`, `dict_id`, `item_text`, `item_value`, `description`, `sort_order`, `status`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES ('1788100010353664002', '1788099949196517378', '是', '1', '', 1, 1, 'yyl', '2024-05-08 14:53:58', NULL, NULL);
 update computer_room set enable_remote_store=0;
-
+alter table datasource_prop add mysql_version varchar(50);
 
 
